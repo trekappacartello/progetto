@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body onload="startGame()">
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
+
+    <div>
+        <button onclick="buttonAction('moveup')">Up</button>
+        <button onclick="buttonAction('movedown')">Down</button>
+        <button onclick="buttonAction('moveleft')">Left</button>
+        <button onclick="buttonAction('moveright')">Right</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="sprites.js"></script> <!-- Inclusione del file JavaScript -->
+</body>
+
+</html>
