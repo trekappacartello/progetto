@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animazione del Personaggio</title>
     <style>
+        /* Stile per il canvas */
         canvas {
             border: 1px solid #d3d3d3;
             background-color: #f1f1f1;
+            display: block;
+            margin: 20px auto;
+        }
+
+        /* Stile per i pulsanti */
+        .controls {
+            text-align: center;
+            margin-top: 10px;
         }
 
         button {
             margin: 5px;
-            padding: 10px;
+            padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #e7e7e7;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #d3d3d3;
         }
     </style>
 </head>
 
 <body onload="startGame()">
+    <h1 style="text-align: center;">Animazione del Personaggio</h1>
+
+    <!-- Canvas per il gioco -->
     <canvas id="gameCanvas" width="480" height="320"></canvas>
 
-    <div>
-        <button onclick="buttonAction('moveup')">Up</button>
-        <button onclick="buttonAction('movedown')">Down</button>
-        <button onclick="buttonAction('moveleft')">Left</button>
-        <button onclick="buttonAction('moveright')">Right</button>
+    <!-- Controlli per il movimento -->
+    <div class="controls">
+        <button onmousedown="buttonAction('moveup')" onmouseup="clearmove()">Su</button><br>
+        <button onmousedown="buttonAction('moveleft')" onmouseup="clearmove()">Sinistra</button>
+        <button onmousedown="buttonAction('moveright')" onmouseup="clearmove()">Destra</button><br>
+        <button onmousedown="buttonAction('movedown')" onmouseup="clearmove()">Giù</button>
     </div>
 
-    <script src="script.js"></script>
-    <script src="sprites.js"></script> <!-- Inclusione del file JavaScript -->
+    <!-- Inclusione dei file JavaScript -->
+    <script src="sprites.js"></script> <!-- File per la gestione degli sprite -->
+    <script src="script.js"></script> <!-- File principale del gioco -->
 </body>
 
 </html>
