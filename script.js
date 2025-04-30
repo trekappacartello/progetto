@@ -1,7 +1,8 @@
 // Funzione principale per avviare il gioco
 function startGame() {
     myGameArea.start(); // Avvia l'area di gioco
-    animatedObject.loadImages();  // Carica le immagini per l'oggetto animato
+    animatedObject.loadImages(); // Carica le immagini per il primo personaggio
+    secondCharacter.loadImages(); // Carica le immagini per il secondo personaggio
 }
 
 // Oggetto che rappresenta l'area di gioco
@@ -15,102 +16,32 @@ var myGameArea = {
         // Pulisce l'intero canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
-    drawGameObject: function(gameObject) {
-        // Disegna un oggetto di gioco sul canvas
-        this.context.drawImage(
-            gameObject.image, // Immagine da disegnare
-            gameObject.x, // Posizione X
-            gameObject.y, // Posizione Y
-            gameObject.width, // Larghezza dell'immagine
-            gameObject.height // Altezza dell'immagine
-        );
-    }
-};
-
-// Funzione per aggiornare il movimento in base ai tasti premuti
-function updateMovement() {
-    let isMoving = false; // Variabile temporanea per verificare il movimento
-
-    if (keys['w']) { // Tasto W per muoversi in alto
-        animatedObject.speedY = -3; // Aumenta la velocità verticale
-        isMoving = true;
-    } else if (keys['s']) { // Tasto S per muoversi in basso
-        animatedObject.speedY = 3; // Aumenta la velocità verticale
-        isMoving = true;
-    } else {
-        animatedObject.speedY = 0; // Ferma il movimento verticale
-    }
-
-    if (keys['a']) { // Tasto A per muoversi a sinistra
-        animatedObject.speedX = -3; // Aumenta la velocità orizzontale
-        isMoving = true;
-    } else if (keys['d']) { // Tasto D per muoversi a destra
-        animatedObject.speedX = 3; // Aumenta la velocità orizzontale
-        isMoving = true;
-    } else {
-        animatedObject.speedX = 0; // Ferma il movimento orizzontale
-    }
-
-    // Aggiorna lo stato di movimento del personaggio
-    animatedObject.isMoving = isMoving;
-}
-
-// Funzione per aggiornare l'area di gioco
-function updateGameArea() {
-    myGameArea.clear(); // Pulisce il canvas
-    updateMovement(); // Aggiorna il movimento in base ai tasti premuti
-    animatedObject.update(); // Aggiorna lo stato dell'oggetto animato
-    myGameArea.drawGameObject(animatedObject); // Disegna l'oggetto animato sul canvas
-}
-
-// Oggetto che rappresenta il personaggio animato
-var animatedObject = {
-    speedX: 0, // Velocità orizzontale
-    speedY: 0, // Velocità verticale
-    width: 60, // Larghezza del personaggio
-    height: 60, // Altezza del personaggio
-    x: 10, // Posizione iniziale X
-    y: 120, // Posizione iniziale Y
-    imageList: [], // Array per contenere le immagini dell'animazione
-    contaFrame: 0, // Contatore dei frame per gestire l'animazione
-    actualFrame: 0, // Frame corrente da visualizzare
-    isMoving: false, // Stato del movimento (true se il personaggio si muove)
-
-    // Funzione per aggiornare lo stato del personaggio
-    update: function() {
-        // Aggiorna la posizione X e Y in base alla velocità
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        // Controlla i limiti del canvas
-        if (this.x < 0) this.x = 0; // Limite sinistro
-        if (this.y < 0) this.y = 0; // Limite superiore
-        if (this.x + this.width > myGameArea.canvas.width) {
-            this.x = myGameArea.canvas.width - this.width; // Limite destro
+    drawGameObject: function(gameObject, isMirrored = false) {
+        if (isMirrored) {
+            // Salva il contesto corrente
+            this.context.save();
+            // Riflette orizzontalmente il contesto
+            this.context.scale(-1, 1);
+            // Disegna l'immagine specchiata
+            this.context.drawImage(
+                gameObject.image,
+                -gameObject.x - gameObject.width, // Posizione X specchiata
+                gameObject.y,
+                gameObject.width,
+                gameObject.height
+            );
+            // Ripristina il contesto originale
+            this.context.restore();
+        } else {
+            // Disegna normalmente
+            this.context.drawImage(
+                gameObject.image,
+                gameObject.x,
+                gameObject.y,
+                gameObject.width,
+                gameObject.height
+            );
         }
-        if (this.y + this.height > myGameArea.canvas.height) {
-            this.y = myGameArea.canvas.height - this.height; // Limite inferiore
-        }
-
-        // Aggiorna l'animazione solo se il personaggio si muove
-        if (this.isMoving) {
-            this.contaFrame++; // Incrementa il contatore dei frame
-            if (this.contaFrame === 3) { // Cambia frame ogni 3 aggiornamenti (più veloce)
-                this.contaFrame = 0; // Resetta il contatore dei frame
-                this.actualFrame = (this.actualFrame + 1) % this.imageList.length; // Passa al frame successivo
-                this.image = this.imageList[this.actualFrame]; // Imposta il nuovo frame
-            }
-        }
-    },
-
-    // Funzione per caricare le immagini dell'animazione
-    loadImages: function() {
-        for (var imgPath of running) { // Itera su ogni percorso immagine nell'array `running`
-            var img = new Image(this.width, this.height); // Crea un nuovo oggetto immagine
-            img.src = imgPath; // Imposta il percorso dell'immagine
-            this.imageList.push(img); // Aggiunge l'immagine all'array
-        }
-        this.image = this.imageList[this.actualFrame]; // Imposta l'immagine iniziale
     }
 };
 
@@ -126,3 +57,136 @@ document.addEventListener("keydown", function(event) {
 document.addEventListener("keyup", function(event) {
     keys[event.key] = false; // Registra il tasto come rilasciato
 });
+
+// Funzione per aggiornare il movimento del primo personaggio (W, A, S, D)
+function updateMovement() {
+    let isMoving = false;
+
+    if (keys['w']) { // Tasto W per muoversi in alto
+        animatedObject.speedY = -3;
+        isMoving = true;
+    } else if (keys['s']) { // Tasto S per muoversi in basso
+        animatedObject.speedY = 3;
+        isMoving = true;
+    } else {
+        animatedObject.speedY = 0;
+    }
+
+    if (keys['a']) { // Tasto A per muoversi a sinistra
+        animatedObject.speedX = -3;
+        isMoving = true;
+    } else if (keys['d']) { // Tasto D per muoversi a destra
+        animatedObject.speedX = 3;
+        isMoving = true;
+    } else {
+        animatedObject.speedX = 0;
+    }
+
+    animatedObject.isMoving = isMoving;
+}
+
+// Funzione per aggiornare il movimento del secondo personaggio (Frecce direzionali)
+function updateSecondMovement() {
+    let isMoving = false;
+
+    if (keys['ArrowUp']) { // Freccia Su per muoversi in alto
+        secondCharacter.speedY = -3;
+        isMoving = true;
+    } else if (keys['ArrowDown']) { // Freccia Giù per muoversi in basso
+        secondCharacter.speedY = 3;
+        isMoving = true;
+    } else {
+        secondCharacter.speedY = 0;
+    }
+
+    if (keys['ArrowLeft']) { // Freccia Sinistra per muoversi a sinistra
+        secondCharacter.speedX = -3;
+        isMoving = true;
+    } else if (keys['ArrowRight']) { // Freccia Destra per muoversi a destra
+        secondCharacter.speedX = 3;
+        isMoving = true;
+    } else {
+        secondCharacter.speedX = 0;
+    }
+
+    secondCharacter.isMoving = isMoving;
+}
+
+// Funzione per aggiornare l'area di gioco
+function updateGameArea() {
+    myGameArea.clear(); // Pulisce il canvas
+    updateMovement(); // Aggiorna il movimento del primo personaggio
+    updateSecondMovement(); // Aggiorna il movimento del secondo personaggio
+    animatedObject.update(); // Aggiorna lo stato del primo personaggio
+    secondCharacter.update(); // Aggiorna lo stato del secondo personaggio
+    myGameArea.drawGameObject(animatedObject); // Disegna il primo personaggio sul canvas
+    myGameArea.drawGameObject(secondCharacter, true); // Disegna il secondo personaggio specchiato
+}
+
+// Oggetto che rappresenta il primo personaggio animato
+var animatedObject = {
+    speedX: 0,
+    speedY: 0,
+    width: 60,
+    height: 60,
+    x: 10,
+    y: 120,
+    imageList: [],
+    contaFrame: 0,
+    actualFrame: 0,
+    isMoving: false,
+    update: function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.isMoving) {
+            this.contaFrame++;
+            if (this.contaFrame === 3) {
+                this.contaFrame = 0;
+                this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
+                this.image = this.imageList[this.actualFrame];
+            }
+        }
+    },
+    loadImages: function() {
+        for (var imgPath of running) {
+            var img = new Image(this.width, this.height);
+            img.src = imgPath;
+            this.imageList.push(img);
+        }
+        this.image = this.imageList[0];
+    }
+};
+
+// Oggetto che rappresenta il secondo personaggio animato
+var secondCharacter = {
+    speedX: 0,
+    speedY: 0,
+    width: 60,
+    height: 60,
+    x: 200,
+    y: 120,
+    imageList: [],
+    contaFrame: 0,
+    actualFrame: 0,
+    isMoving: false,
+    update: function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.isMoving) {
+            this.contaFrame++;
+            if (this.contaFrame === 3) {
+                this.contaFrame = 0;
+                this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
+                this.image = this.imageList[this.actualFrame];
+            }
+        }
+    },
+    loadImages: function() {
+        for (var imgPath of runningSecond) {
+            var img = new Image(this.width, this.height);
+            img.src = imgPath;
+            this.imageList.push(img);
+        }
+        this.image = this.imageList[0];
+    }
+};

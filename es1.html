@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Animazione del Personaggio</title>
+    <title>Botte in strada</title>
     <style>
         /* Stile per il canvas */
         canvas {
@@ -37,19 +37,10 @@
 </head>
 
 <body onload="startGame()">
-    <h1 style="text-align: center;">Animazione del Personaggio</h1>
+    <h1 style="text-align: center;">Botte in strada</h1>
 
     <!-- Canvas per il gioco -->
-    <canvas id="gameCanvas" width="480" height="320"></canvas>
-
-    <!-- Controlli per il movimento -->
-    <div class="controls">
-        <button onmousedown="buttonAction('moveup')" onmouseup="clearmove()">Su</button><br>
-        <button onmousedown="buttonAction('moveleft')" onmouseup="clearmove()">Sinistra</button>
-        <button onmousedown="buttonAction('moveright')" onmouseup="clearmove()">Destra</button><br>
-        <button onmousedown="buttonAction('movedown')" onmouseup="clearmove()">Giù</button>
-    </div>
-
+    <canvas id="gameCanvas" width="1500" height="700" style="background-color: #f1f1f1;"></canvas>
     <!-- Inclusione dei file JavaScript -->
     <script src="sprites.js"></script> <!-- File per la gestione degli sprite -->
     <script src="script.js"></script> <!-- File principale del gioco -->
