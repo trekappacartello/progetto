@@ -58,18 +58,13 @@ document.addEventListener("keyup", function(event) {
     keys[event.key] = false; // Registra il tasto come rilasciato
 });
 
-// Funzione per aggiornare il movimento del primo personaggio (W, A, S, D)
+// Funzione per aggiornare il movimento del primo personaggio
 function updateMovement() {
     let isMoving = false;
 
-    if (keys['w']) { // Tasto W per muoversi in alto
-        animatedObject.speedY = -3;
+    if (keys['w'] && animatedObject.speedY === 0) { // Tasto W per saltare
+        animatedObject.speedY = -15; // Impulso verso l'alto
         isMoving = true;
-    } else if (keys['s']) { // Tasto S per muoversi in basso
-        animatedObject.speedY = 3;
-        isMoving = true;
-    } else {
-        animatedObject.speedY = 0;
     }
 
     if (keys['a']) { // Tasto A per muoversi a sinistra
@@ -85,18 +80,13 @@ function updateMovement() {
     animatedObject.isMoving = isMoving;
 }
 
-// Funzione per aggiornare il movimento del secondo personaggio (Frecce direzionali)
+// Funzione per aggiornare il movimento del secondo personaggio
 function updateSecondMovement() {
     let isMoving = false;
 
-    if (keys['ArrowUp']) { // Freccia Su per muoversi in alto
-        secondCharacter.speedY = -3;
+    if (keys['ArrowUp'] && secondCharacter.speedY === 0) { // Freccia Su per saltare
+        secondCharacter.speedY = -15; // Impulso verso l'alto
         isMoving = true;
-    } else if (keys['ArrowDown']) { // Freccia Giù per muoversi in basso
-        secondCharacter.speedY = 3;
-        isMoving = true;
-    } else {
-        secondCharacter.speedY = 0;
     }
 
     if (keys['ArrowLeft']) { // Freccia Sinistra per muoversi a sinistra
@@ -123,21 +113,38 @@ function updateGameArea() {
     myGameArea.drawGameObject(secondCharacter, true); // Disegna il secondo personaggio specchiato
 }
 
-// Oggetto che rappresenta il primo personaggio animato
+// Metodo update per il primo personaggio
 var animatedObject = {
     speedX: 0,
     speedY: 0,
     width: 60,
     height: 60,
-    x: 10,
-    y: 120,
+    x: myGameArea.canvas.width / 4 - 30, // Posizionato al centro sinistro
+    y: myGameArea.canvas.height - 60, // Alla base del canvas
     imageList: [],
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
     update: function() {
+        // Applica la gravità
+        this.speedY += 1; // Gravità aumentata
+        if (this.speedY > 10) this.speedY = 10; // Limita la velocità di caduta
+
+        // Aggiorna la posizione
         this.x += this.speedX;
         this.y += this.speedY;
+
+        // Impedisce al personaggio di uscire dai bordi del canvas
+        if (this.x < 0) this.x = 0; // Limite sinistro
+        if (this.x + this.width > myGameArea.canvas.width) {
+            this.x = myGameArea.canvas.width - this.width; // Limite destro
+        }
+        if (this.y + this.height > myGameArea.canvas.height) {
+            this.y = myGameArea.canvas.height - this.height; // Limite inferiore
+            this.speedY = 0; // Ferma la caduta quando tocca il suolo
+        }
+
+
         if (this.isMoving) {
             this.contaFrame++;
             if (this.contaFrame === 3) {
@@ -157,21 +164,37 @@ var animatedObject = {
     }
 };
 
-// Oggetto che rappresenta il secondo personaggio animato
+// Metodo update per il secondo personaggio
 var secondCharacter = {
     speedX: 0,
     speedY: 0,
     width: 60,
     height: 60,
-    x: 200,
-    y: 120,
+    x: (myGameArea.canvas.width * 3) / 4 - 30, // Posizionato al centro destro
+    y: myGameArea.canvas.height - 60, // Alla base del canvas
     imageList: [],
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
     update: function() {
+        // Applica la gravità
+        this.speedY += 1; // Gravità aumentata
+        if (this.speedY > 10) this.speedY = 10; // Limita la velocità di caduta
+
+        // Aggiorna la posizione
         this.x += this.speedX;
         this.y += this.speedY;
+
+        // Impedisce al personaggio di uscire dai bordi del canvas
+        if (this.x < 0) this.x = 0; // Limite sinistro
+        if (this.x + this.width > myGameArea.canvas.width) {
+            this.x = myGameArea.canvas.width - this.width; // Limite destro
+        }
+        if (this.y + this.height > myGameArea.canvas.height) {
+            this.y = myGameArea.canvas.height - this.height; // Limite inferiore
+            this.speedY = 0; // Ferma la caduta quando tocca il suolo
+        }
+
         if (this.isMoving) {
             this.contaFrame++;
             if (this.contaFrame === 3) {
