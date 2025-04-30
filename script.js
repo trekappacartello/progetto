@@ -62,8 +62,9 @@ document.addEventListener("keyup", function(event) {
 function updateMovement() {
     let isMoving = false;
 
-    if (keys['w'] && animatedObject.speedY === 0) { // Tasto W per saltare
+    if (keys['w'] && animatedObject.jumpCount < 2) { // Tasto W per saltare
         animatedObject.speedY = -15; // Impulso verso l'alto
+        animatedObject.jumpCount++; // Incrementa il conteggio dei salti
         isMoving = true;
     }
 
@@ -84,8 +85,9 @@ function updateMovement() {
 function updateSecondMovement() {
     let isMoving = false;
 
-    if (keys['ArrowUp'] && secondCharacter.speedY === 0) { // Freccia Su per saltare
+    if (keys['ArrowUp'] && secondCharacter.jumpCount < 2) { // Freccia Su per saltare
         secondCharacter.speedY = -15; // Impulso verso l'alto
+        secondCharacter.jumpCount++; // Incrementa il conteggio dei salti
         isMoving = true;
     }
 
@@ -125,6 +127,7 @@ var animatedObject = {
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
+    jumpCount: 0, // Conta i salti consecutivi
     update: function() {
         // Applica la gravità
         this.speedY += 1; // Gravità aumentata
@@ -142,8 +145,8 @@ var animatedObject = {
         if (this.y + this.height > myGameArea.canvas.height) {
             this.y = myGameArea.canvas.height - this.height; // Limite inferiore
             this.speedY = 0; // Ferma la caduta quando tocca il suolo
+            this.jumpCount = 0; // Resetta il conteggio dei salti
         }
-
 
         if (this.isMoving) {
             this.contaFrame++;
@@ -176,6 +179,7 @@ var secondCharacter = {
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
+    jumpCount: 0, // Conta i salti consecutivi
     update: function() {
         // Applica la gravità
         this.speedY += 1; // Gravità aumentata
@@ -193,6 +197,7 @@ var secondCharacter = {
         if (this.y + this.height > myGameArea.canvas.height) {
             this.y = myGameArea.canvas.height - this.height; // Limite inferiore
             this.speedY = 0; // Ferma la caduta quando tocca il suolo
+            this.jumpCount = 0; // Resetta il conteggio dei salti
         }
 
         if (this.isMoving) {
