@@ -27,37 +27,40 @@ var myGameArea = {
     }
 };
 
+// Funzione per aggiornare il movimento in base ai tasti premuti
+function updateMovement() {
+    let isMoving = false; // Variabile temporanea per verificare il movimento
+
+    if (keys['w']) { // Tasto W per muoversi in alto
+        animatedObject.speedY = -3; // Aumenta la velocità verticale
+        isMoving = true;
+    } else if (keys['s']) { // Tasto S per muoversi in basso
+        animatedObject.speedY = 3; // Aumenta la velocità verticale
+        isMoving = true;
+    } else {
+        animatedObject.speedY = 0; // Ferma il movimento verticale
+    }
+
+    if (keys['a']) { // Tasto A per muoversi a sinistra
+        animatedObject.speedX = -3; // Aumenta la velocità orizzontale
+        isMoving = true;
+    } else if (keys['d']) { // Tasto D per muoversi a destra
+        animatedObject.speedX = 3; // Aumenta la velocità orizzontale
+        isMoving = true;
+    } else {
+        animatedObject.speedX = 0; // Ferma il movimento orizzontale
+    }
+
+    // Aggiorna lo stato di movimento del personaggio
+    animatedObject.isMoving = isMoving;
+}
+
 // Funzione per aggiornare l'area di gioco
 function updateGameArea() {
     myGameArea.clear(); // Pulisce il canvas
+    updateMovement(); // Aggiorna il movimento in base ai tasti premuti
     animatedObject.update(); // Aggiorna lo stato dell'oggetto animato
     myGameArea.drawGameObject(animatedObject); // Disegna l'oggetto animato sul canvas
-}
-
-// Funzione per gestire i movimenti del personaggio in base all'azione
-function buttonAction(action) {
-    animatedObject.isMoving = true; // Attiva l'animazione
-    switch (action) {
-        case 'moveup': // Se l'azione è "muovi in alto"
-            animatedObject.speedY = -2;  // Aumenta la velocità verso l'alto
-            break;
-        case 'movedown': // Se l'azione è "muovi in basso"
-            animatedObject.speedY = 2;  // Aumenta la velocità verso il basso
-            break;
-        case 'moveleft': // Se l'azione è "muovi a sinistra"
-            animatedObject.speedX = -2;  // Aumenta la velocità verso sinistra
-            break;
-        case 'moveright': // Se l'azione è "muovi a destra"
-            animatedObject.speedX = 2;  // Aumenta la velocità verso destra
-            break;
-    }
-}
-
-// Funzione per fermare il movimento del personaggio
-function clearmove() {
-    animatedObject.speedX = 0;  // Ferma il movimento orizzontale
-    animatedObject.speedY = 0;  // Ferma il movimento verticale
-    animatedObject.isMoving = false; // Disattiva l'animazione
 }
 
 // Oggetto che rappresenta il personaggio animato
@@ -92,7 +95,7 @@ var animatedObject = {
         // Aggiorna l'animazione solo se il personaggio si muove
         if (this.isMoving) {
             this.contaFrame++; // Incrementa il contatore dei frame
-            if (this.contaFrame === 2) { // Cambia frame ogni 3 aggiornamenti
+            if (this.contaFrame === 3) { // Cambia frame ogni 3 aggiornamenti (più veloce)
                 this.contaFrame = 0; // Resetta il contatore dei frame
                 this.actualFrame = (this.actualFrame + 1) % this.imageList.length; // Passa al frame successivo
                 this.image = this.imageList[this.actualFrame]; // Imposta il nuovo frame
@@ -110,3 +113,16 @@ var animatedObject = {
         this.image = this.imageList[this.actualFrame]; // Imposta l'immagine iniziale
     }
 };
+
+// Oggetto per tenere traccia dei tasti premuti
+var keys = {};
+
+// Aggiungi un listener per i tasti premuti
+document.addEventListener("keydown", function(event) {
+    keys[event.key] = true; // Registra il tasto come premuto
+});
+
+// Aggiungi un listener per i tasti rilasciati
+document.addEventListener("keyup", function(event) {
+    keys[event.key] = false; // Registra il tasto come rilasciato
+});
