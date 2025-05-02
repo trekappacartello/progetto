@@ -58,6 +58,20 @@ document.addEventListener("keyup", function(event) {
     keys[event.key] = false; // Registra il tasto come rilasciato
 });
 
+// Aggiungi un listener per il mouse premuto
+document.addEventListener("mousedown", function(event) {
+    if (event.button === 0) { // Tasto sinistro del mouse
+        secondCharacter.isPunching = true;
+    }
+});
+
+// Aggiungi un listener per il mouse rilasciato
+document.addEventListener("mouseup", function(event) {
+    if (event.button === 0) { // Tasto sinistro del mouse
+        secondCharacter.isPunching = false;
+    }
+});
+
 // Funzione per aggiornare il movimento del primo personaggio
 function updateMovement() {
     let isMoving = false;
@@ -78,7 +92,7 @@ function updateMovement() {
         animatedObject.speedX = 0;
     }
 
-    animatedObject.isMoving = isMoving;
+    animatedObject.isMoving = isMoving; // Aggiorna lo stato di movimento
 }
 
 // Funzione per aggiornare il movimento del secondo personaggio
@@ -101,7 +115,7 @@ function updateSecondMovement() {
         secondCharacter.speedX = 0;
     }
 
-    secondCharacter.isMoving = isMoving;
+    secondCharacter.isMoving = isMoving; // Aggiorna lo stato di movimento
 }
 
 // Funzione per aggiornare l'area di gioco
@@ -119,11 +133,14 @@ function updateGameArea() {
 var animatedObject = {
     speedX: 0,
     speedY: 0,
-    width: 60,
-    height: 60,
-    x: myGameArea.canvas.width / 4 - 30, // Posizionato al centro sinistro
-    y: myGameArea.canvas.height - 60, // Alla base del canvas
-    imageList: [],
+    width: 60 * 3.5, // Ingrandito del 250%
+    height: 60 * 3.5, // Ingrandito del 250%
+    x: myGameArea.canvas.width / 4 - (60 * 2.5) / 2, // Posizionato al centro sinistro
+    y: myGameArea.canvas.height - (60 * 2.5), // Alla base del canvas
+    imageListStatic: [],
+    imageListMoving: [],
+    imageListJumping: [],
+    imageListPunching: [],
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
@@ -148,21 +165,61 @@ var animatedObject = {
             this.jumpCount = 0; // Resetta il conteggio dei salti
         }
 
-        if (this.isMoving) {
-            this.contaFrame++;
-            if (this.contaFrame === 3) {
-                this.contaFrame = 0;
-                this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
-                this.image = this.imageList[this.actualFrame];
-            }
+        // Cambia le immagini in base allo stato del personaggio
+        if (keys['q']) { // Tasto Q per il pugno
+            this.imageList = this.imageListPunching; // Usa le immagini di pugno
+        } else if (this.speedY !== 0) {
+            this.imageList = this.imageListJumping; // Usa le immagini di salto
+        } else if (this.isMoving) {
+            this.imageList = this.imageListMoving; // Usa le immagini di movimento
+        } else {
+            this.imageList = this.imageListStatic; // Usa le immagini statiche
+        }
+
+        // Aggiorna il frame delle immagini
+        this.contaFrame++;
+        if (this.contaFrame === 10) { // Cambia immagine ogni 10 frame
+            this.contaFrame = 0;
+            this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
+            this.image = this.imageList[this.actualFrame];
         }
     },
     loadImages: function() {
-        for (var imgPath of running) {
-            var img = new Image(this.width, this.height);
-            img.src = imgPath;
-            this.imageList.push(img);
+        this.imageListStatic = []; // Immagini statiche (SM)
+        this.imageListMoving = []; // Immagini in movimento (W)
+        this.imageListJumping = []; // Immagini di salto (J)
+        this.imageListPunching = []; // Immagini di pugno (P)
+
+        // Carica le immagini statiche
+        for (let i = 1; i <= 5; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/SM${i}.png`; // Percorso delle immagini statiche
+            this.imageListStatic.push(img);
         }
+
+        // Carica le immagini in movimento
+        for (let i = 1; i <= 5; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/W${i}.png`; // Percorso delle immagini in movimento
+            this.imageListMoving.push(img);
+        }
+
+        // Carica le immagini di salto
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/J${i}.png`; // Percorso delle immagini di salto
+            this.imageListJumping.push(img);
+        }
+
+        // Carica le immagini di pugno
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/P${i}.png`; // Percorso delle immagini di pugno
+            this.imageListPunching.push(img);
+        }
+
+        // Imposta le immagini statiche come predefinite
+        this.imageList = this.imageListStatic;
         this.image = this.imageList[0];
     }
 };
@@ -171,14 +228,18 @@ var animatedObject = {
 var secondCharacter = {
     speedX: 0,
     speedY: 0,
-    width: 60,
-    height: 60,
-    x: (myGameArea.canvas.width * 3) / 4 - 30, // Posizionato al centro destro
-    y: myGameArea.canvas.height - 60, // Alla base del canvas
-    imageList: [],
+    width: 60 * 3.5, // Ingrandito del 250%
+    height: 60 * 3.5, // Ingrandito del 250%
+    x: (myGameArea.canvas.width * 3) / 4 - (60 * 2.5) / 2, // Posizionato al centro destro
+    y: myGameArea.canvas.height - (60 * 2.5), // Alla base del canvas
+    imageListStatic: [],
+    imageListMoving: [],
+    imageListJumping: [],
+    imageListPunching: [],
     contaFrame: 0,
     actualFrame: 0,
     isMoving: false,
+    isPunching: false, // Stato di pugno
     jumpCount: 0, // Conta i salti consecutivi
     update: function() {
         // Applica la gravità
@@ -200,21 +261,61 @@ var secondCharacter = {
             this.jumpCount = 0; // Resetta il conteggio dei salti
         }
 
-        if (this.isMoving) {
-            this.contaFrame++;
-            if (this.contaFrame === 3) {
-                this.contaFrame = 0;
-                this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
-                this.image = this.imageList[this.actualFrame];
-            }
+        // Cambia le immagini in base allo stato del personaggio
+        if (this.isPunching) { // Tasto sinistro del mouse per il pugno
+            this.imageList = this.imageListPunching; // Usa le immagini di pugno
+        } else if (this.speedY !== 0) {
+            this.imageList = this.imageListJumping; // Usa le immagini di salto
+        } else if (this.isMoving) {
+            this.imageList = this.imageListMoving; // Usa le immagini di movimento
+        } else {
+            this.imageList = this.imageListStatic; // Usa le immagini statiche
+        }
+
+        // Aggiorna il frame delle immagini
+        this.contaFrame++;
+        if (this.contaFrame === 10) { // Cambia immagine ogni 10 frame
+            this.contaFrame = 0;
+            this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
+            this.image = this.imageList[this.actualFrame];
         }
     },
     loadImages: function() {
-        for (var imgPath of runningSecond) {
-            var img = new Image(this.width, this.height);
-            img.src = imgPath;
-            this.imageList.push(img);
+        this.imageListStatic = []; // Immagini statiche (SM)
+        this.imageListMoving = []; // Immagini in movimento (W)
+        this.imageListJumping = []; // Immagini di salto (J)
+        this.imageListPunching = []; // Immagini di pugno (P)
+
+        // Carica le immagini statiche
+        for (let i = 1; i <= 5; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/SM${i}.png`; // Percorso delle immagini statiche
+            this.imageListStatic.push(img);
         }
+
+        // Carica le immagini in movimento
+        for (let i = 1; i <= 5; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/W${i}.png`; // Percorso delle immagini in movimento
+            this.imageListMoving.push(img);
+        }
+
+        // Carica le immagini di salto
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/J${i}.png`; // Percorso delle immagini di salto
+            this.imageListJumping.push(img);
+        }
+
+        // Carica le immagini di pugno
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image(this.width, this.height);
+            img.src = `sprites/P${i}.png`; // Percorso delle immagini di pugno
+            this.imageListPunching.push(img);
+        }
+
+        // Imposta le immagini statiche come predefinite
+        this.imageList = this.imageListStatic;
         this.image = this.imageList[0];
     }
 };
